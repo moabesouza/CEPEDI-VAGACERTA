@@ -1,12 +1,19 @@
 import axios from "axios";
 import { User } from "../@types/user";
 
-const API_BASE_URL = "http://192.168.0.112:3000";
+const API_BASE_URL = "http://192.168.0.10:3000";
 
-const getJobs = async () => {
-  const response = await axios.get(`${API_BASE_URL}/vagas`);
-  return response.data;
+const getEmpresa = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/empresa`);
+    console.log("Dados da empresa:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao obter dados da empresa:", error);
+    throw error; 
+  }
 };
+
 
 const getUsers = async () => {
   const response = await axios.get(`${API_BASE_URL}/usuarios`);
@@ -19,8 +26,8 @@ const postUsers = async (data: User) => {
 };
 
 const api = {
-  jobs: {
-    get: getJobs,
+  empresa: {
+    get: getEmpresa,
   },
   users: {
     get: getUsers,

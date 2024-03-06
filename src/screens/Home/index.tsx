@@ -3,7 +3,7 @@ import * as Device from "expo-device";
 import * as Location from "expo-location";
 import { useCallback, useEffect, useState } from "react";
 import MapView, { Marker, PROVIDER_GOOGLE, Region } from "react-native-maps";
-import { Job } from "../../@types/job";
+import { Empresa } from "../../@types/job";
 import { Button } from "../../components/Button";
 import { Logo } from "../../components/Logo";
 import api from "../../lib/api";
@@ -12,20 +12,26 @@ import { Container, Counter, Info, Wrapper } from "./styles";
 
 export default function Home() {
   const [currentLocation, setCurrentLocation] = useState<Region>();
-  const [jobs, setJobs] = useState<Job[]>([]);
+  const [empresas, setEmpresas] = useState<Empresa[]>([]);
   const { navigate } = useNavigation<INavigationProps>();
 
   useEffect(() => {
     const fetchData = async () => {
-      const jobs = await api.jobs.get();
-      if (jobs) setJobs(jobs);
+      try {
+        const empresasData = await api.empresa.get();
+        if (empresasData) setEmpresas(empresasData);
+      } catch (error) {
+        console.error("Erro ao obter empresas:", error);
+    
+      }
     };
 
-    if (Device.isDevice) {
-      (async () => {
+    const getLocation = async () => {
+      try {
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== "granted") {
           console.log("Permissão negada");
+       
           return;
         }
 
@@ -36,28 +42,23 @@ export default function Home() {
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         });
-      })();
-    } else {
-      console.log("Você está em um emulador. A localização será emulada.");
-      setCurrentLocation({
-        latitude: 37.78825,
-        longitude: -122.4324,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
-      });
-    }
+      } catch (error) {
+        console.error("Erro ao obter a localização:", error);
+     
+      }
+    };
 
     fetchData();
+    getLocation();
   }, []);
 
   const handleGoToProfile = useCallback(() => {
     navigate("Profile");
   }, []);
 
-  const handleMarkerPress = useCallback((job: Job) => {
-    navigate("Detail", job);
+  const handleMarkerPress = useCallback((empresa: Empresa) => {
+    navigate("Detail", { empresa, vagas: empresa.vagas });
   }, []);
-
   return (
     <Wrapper>
       <MapView
@@ -69,21 +70,21 @@ export default function Home() {
         }}
         initialRegion={currentLocation}
       >
-        {jobs.length > 0 &&
-          jobs.map((job) => (
+        {empresas.length > 0 &&
+          empresas.map((empresaItem) => (
             <Marker
-              key={job.id}
-              onPress={() => handleMarkerPress(job)}
+              key={empresaItem.id}
+              onPress={() => handleMarkerPress(empresaItem)}
               coordinate={{
-                latitude: job.latitude,
-                longitude: job.longitude,
+                latitude: empresaItem.latitude,
+                longitude: empresaItem.longitude,
               }}
             />
           ))}
       </MapView>
       <Container>
         <Logo />
-        <Counter>{jobs.length} vagas encontradas</Counter>
+        <Counter>{empresas.length} empresas contratando.</Counter>
         <Info>Clique no marcador para saber mais sobre a vaga.</Info>
         <Button title="Ver meus dados" onPress={handleGoToProfile} />
       </Container>

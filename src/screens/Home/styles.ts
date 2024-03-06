@@ -6,6 +6,8 @@ export const Wrapper = styled.View`
   align-items: center;
 `;
 
+
+
 export const Container = styled.View`
   flex: 1;
   align-items: center;
@@ -15,7 +17,9 @@ export const Container = styled.View`
   gap: 16px;
 
   background-color: #ecfffb;
+  margin-bottom: 30px; 
 `;
+
 
 export const Counter = styled.Text`
   font-size: 14px;
