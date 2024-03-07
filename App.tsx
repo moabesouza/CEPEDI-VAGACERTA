@@ -1,3 +1,5 @@
+import React from 'react';
+import { UserProvider } from './src/contexts/userContext';
 import {
   Inter_400Regular,
   Inter_500Medium,
@@ -6,31 +8,34 @@ import {
 } from "@expo-google-fonts/inter";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useCallback } from "react";
-
+import { useEffect } from "react";
 import Router from "./src/routes";
 
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
-  const fontsLoaded = useFonts({
+  const [fontsLoaded] = useFonts({
     Inter_400Regular,
     Inter_700Bold,
     Inter_500Medium,
   });
 
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
+  useEffect(() => {
+    const onLayoutRootView = async () => {
+      if (fontsLoaded) {
+        await SplashScreen.hideAsync();
+      }
+    };
+
+    onLayoutRootView();
   }, [fontsLoaded]);
 
-  onLayoutRootView();
-
   return (
-    <>
-      <StatusBar style="auto" />
-      {fontsLoaded && <Router />}
-    </>
+    <UserProvider> 
+      <>
+        <StatusBar style="auto" />
+        {fontsLoaded && <Router />}
+      </>
+    </UserProvider>
   );
 }

@@ -1,5 +1,6 @@
-import { TouchableOpacityProps } from "react-native";
+
 import { Container, Title } from "./styles";
+import { TouchableOpacityProps, GestureResponderEvent } from "react-native"; // Importe GestureResponderEvent
 
 interface ButtonProps extends TouchableOpacityProps {
   title?: string;
@@ -19,3 +20,4 @@ export function Button({
     </Container>
   );
 }
+

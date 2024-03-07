@@ -2,9 +2,10 @@ import { useNavigation } from "@react-navigation/native";
 import { useCallback } from "react";
 import { Alert } from "react-native";
 import * as Yup from "yup";
-import { User } from "../../@types/user";
 import api from "../../lib/api";
 import { INavigationProps } from "../RootStackParams";
+import { useContext } from 'react';
+import { UserContext } from '../../contexts/userContext';
 
 interface FormStructure {
   email: string;
@@ -18,8 +19,9 @@ const LoginSchema = Yup.object().shape({
     .min(6, "Mínimo 6 dígitos"),
 });
 
-export default function useLogin() {
+export const useLogin = () => {
   const { navigate } = useNavigation<INavigationProps>();
+  const { setUser } = useContext(UserContext) || { setUser: () => {} }; 
 
   const initialValues: FormStructure = {
     email: "",
@@ -28,26 +30,27 @@ export default function useLogin() {
 
   const handleNavigateToRegister = useCallback(() => {
     navigate("Register");
-  }, [navigator]);
+  }, [navigate]);
 
   const handleNavigateToHome = useCallback(() => {
     navigate("Home");
-  }, [navigator]);
+  }, [navigate]);
 
   const handleFormSubmit = useCallback(async (values: FormStructure) => {
-    const users = await api.users.get();
-
-    const foundUser = users.find(
-      (user: User) =>
-        user.email === values.email && user.senha === values.password
-    );
-
-    if (foundUser) {
-      handleNavigateToHome();
-    } else {
-      Alert.alert("Erro no login", "E-mail ou senha incorretos");
+    try {
+      const foundUser = await api.login(values.email, values.password);
+      if (foundUser) {
+ 
+        setUser(foundUser);
+        handleNavigateToHome();
+      } else {
+        Alert.alert("Erro no login", "E-mail ou senha incorretos");
+      }
+    } catch (error) {
+      console.error("Erro ao fazer login:", error);
+      Alert.alert("Erro no login", "Ocorreu um erro ao fazer login");
     }
-  }, []);
+  }, [navigate, setUser]);
 
   return {
     initialValues,
@@ -55,4 +58,4 @@ export default function useLogin() {
     handleFormSubmit,
     handleNavigateToRegister,
   };
-}
+};

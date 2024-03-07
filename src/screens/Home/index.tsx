@@ -1,14 +1,14 @@
-import { useNavigation } from "@react-navigation/native";
-import * as Device from "expo-device";
-import * as Location from "expo-location";
-import { useCallback, useEffect, useState } from "react";
-import MapView, { Marker, PROVIDER_GOOGLE, Region } from "react-native-maps";
-import { Empresa } from "../../@types/job";
-import { Button } from "../../components/Button";
+import React from 'react';
+import { Button } from '../../components/Button';
 import { Logo } from "../../components/Logo";
-import api from "../../lib/api";
+import { Container, Counter, Info, Wrapper, ButtonContainer } from "./styles";
+import { useNavigation } from "@react-navigation/native";
+import { useCallback, useEffect, useState } from "react";
 import { INavigationProps } from "../RootStackParams";
-import { Container, Counter, Info, Wrapper } from "./styles";
+import * as Location from "expo-location";
+import MapView, { Marker, PROVIDER_GOOGLE, Region } from "react-native-maps";
+import api from "../../lib/api";
+import { Empresa } from "../../@types/job";
 
 export default function Home() {
   const [currentLocation, setCurrentLocation] = useState<Region>();
@@ -22,7 +22,6 @@ export default function Home() {
         if (empresasData) setEmpresas(empresasData);
       } catch (error) {
         console.error("Erro ao obter empresas:", error);
-    
       }
     };
 
@@ -31,7 +30,6 @@ export default function Home() {
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== "granted") {
           console.log("Permissão negada");
-       
           return;
         }
 
@@ -44,7 +42,6 @@ export default function Home() {
         });
       } catch (error) {
         console.error("Erro ao obter a localização:", error);
-     
       }
     };
 
@@ -54,20 +51,21 @@ export default function Home() {
 
   const handleGoToProfile = useCallback(() => {
     navigate("Profile");
-  }, []);
+  }, [navigate]);
+
+  const handleGoToLogin = useCallback(() => {
+    navigate("Login");
+  }, [navigate]);
 
   const handleMarkerPress = useCallback((empresa: Empresa) => {
     navigate("Detail", { empresa, vagas: empresa.vagas });
-  }, []);
+  }, [navigate]);
+
   return (
     <Wrapper>
       <MapView
         provider={PROVIDER_GOOGLE}
-        style={{
-          width: "100%",
-          height: "100%",
-          flex: 4,
-        }}
+        style={{ width: "100%", height: "100%", flex: 4 }}
         initialRegion={currentLocation}
       >
         {empresas.length > 0 &&
@@ -86,7 +84,10 @@ export default function Home() {
         <Logo />
         <Counter>{empresas.length} empresas contratando.</Counter>
         <Info>Clique no marcador para saber mais sobre a vaga.</Info>
-        <Button title="Ver meus dados" onPress={handleGoToProfile} />
+        <ButtonContainer>
+          <Button title="Ver meus dados" onPress={handleGoToProfile} style={{ width: 150 }} />
+          <Button title="Sair" onPress={handleGoToLogin} style={{ width: 150, backgroundColor: '#2d767f' }} />
+        </ButtonContainer>
       </Container>
     </Wrapper>
   );

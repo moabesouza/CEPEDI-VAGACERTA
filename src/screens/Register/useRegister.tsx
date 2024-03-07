@@ -1,9 +1,10 @@
 import { useNavigation } from "@react-navigation/native";
-import { useCallback } from "react";
+import { useCallback, useContext } from "react";
 import { Alert } from "react-native";
 import * as Yup from "yup";
 import api from "../../lib/api";
 import { INavigationProps } from "../RootStackParams";
+import { UserContext } from "../../contexts/userContext";
 
 interface FormStructure {
   name: string;
@@ -21,6 +22,7 @@ const RegisterSchema = Yup.object().shape({
 
 export default function useRegister() {
   const { navigate } = useNavigation<INavigationProps>();
+  const { setUser } = useContext(UserContext) || { setUser: () => {} }; 
 
   const initialValues: FormStructure = {
     name: "",
@@ -37,23 +39,30 @@ export default function useRegister() {
   }, [navigate]);
 
   const handleRegister = useCallback(async (values: FormStructure) => {
-    const newUser = {
-      id: new Date().getTime().toString(),
-      name: values.name,
-      email: values.email,
-      senha: values.password, // Será se essa forma de salvar a senha é a melhor? Procure por bcrypt
-      cidade: "",
-      estado: "",
-    };
+    try {
+      const newUser = {
+        id: new Date().getTime().toString(),
+        name: values.name,
+        email: values.email,
+        senha: values.password,
+        cidade: "",
+        estado: "",
+      };
 
-    const res = await api.users.post(newUser);
+      const res = await api.users.post(newUser);
 
-    if (res === 201) {
-      return handleNavigateToHome();
-    } else {
-      return Alert.alert("Erro no registro", "Erro ao registrar usuário");
+      if (res === 201) {
+
+        setUser(newUser);
+        handleNavigateToHome();
+      } else {
+        Alert.alert("Erro no registro", "Erro ao registrar usuário");
+      }
+    } catch (error) {
+      console.error("Erro no registro:", error);
+      Alert.alert("Erro no registro", "Ocorreu um erro ao registrar usuário");
     }
-  }, []);
+  }, [navigate, setUser]);
 
   return {
     initialValues,

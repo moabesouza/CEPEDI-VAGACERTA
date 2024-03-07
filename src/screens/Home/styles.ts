@@ -14,10 +14,10 @@ export const Container = styled.View`
 
   width: 100%;
   padding: 16px;
-  gap: 16px;
+  gap: 10px;
 
   background-color: #ecfffb;
-  margin-bottom: 30px; 
+  margin-bottom: 0px; 
 `;
 
 
@@ -33,3 +33,10 @@ export const Info = styled.Text`
   line-height: 16px;
   text-align: left;
 `;
+ 
+export const ButtonContainer = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+`;
+
