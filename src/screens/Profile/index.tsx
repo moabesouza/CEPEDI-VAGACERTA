@@ -1,13 +1,14 @@
-import { Formik } from "formik";
-import { Button } from "../../components/Button";
-import { LabelledInput } from "../../components/LabelledInput";
-import { Logo } from "../../components/Logo";
-import { Content, Header, Splitter, Wrapper } from "./styles";
-import useProfile from "./useProfile";
+import React from 'react';
+import { Formik } from 'formik';
+import { Button } from '../../components/Button';
+import { LabelledInput } from '../../components/LabelledInput';
+import { Logo } from '../../components/Logo';
+import { Content, Header, Splitter, Wrapper } from './styles';
+import useProfile from './useProfile';
+import { GestureResponderEvent } from 'react-native'; 
 
 export default function Profile() {
-  const { handleFormSubmit, ProfileSchema, handleGoBack, initialValues } =
-    useProfile();
+  const { handleFormSubmit, ProfileSchema, handleGoBack, initialValues } = useProfile();
 
   return (
     <Wrapper>
@@ -16,7 +17,7 @@ export default function Profile() {
           noSpacing
           title="< voltar"
           variant="secondary"
-          onPress={handleGoBack}
+          onPress={handleGoBack} 
         />
         <Logo />
       </Header>
@@ -24,7 +25,7 @@ export default function Profile() {
       <Splitter />
 
       <Formik
-        initialValues={initialValues}
+        initialValues={initialValues} 
         validationSchema={ProfileSchema}
         onSubmit={handleFormSubmit}
       >
@@ -43,10 +44,14 @@ export default function Profile() {
             <LabelledInput
               label="Senha"
               placeholder="digite sua senha"
-              name="password"
+              name="senha"
               secureTextEntry
             />
-            <Button title="Salvar informações" onPress={() => handleSubmit()} />
+            <Button
+              title="Salvar informações"
+              onPress={() => handleSubmit()}
+            />
+
           </Content>
         )}
       </Formik>
